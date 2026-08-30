@@ -1,89 +1,118 @@
-from dotenv import load_dotenv
+
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_qdrant import QdrantVectorStore
 from qdrant_client import QdrantClient
-from qdrant_client.models import Distance, VectorParams
+from qdrant_client.http.models import Distance, VectorParams
 
-load_dotenv()
-
-PDF_PATH = "data/data.pdf"
+#load pdf 
+FILE_PATH = "data/Parvez_FullStack_AI (1).pdf"
 QDRANT_PATH = "qdrant_db"
-COLLECTION_NAME = "pdfData"
+COLLECTION_NAME = "resume_data"
 
-
-#Loading PDF
-def load_pdf():
-    loader = PyPDFLoader(PDF_PATH)
+def upload_pdf():
+    loader = PyPDFLoader(FILE_PATH)
     documents = loader.load()
-    return documents
+    return documents 
 
-#Splitting documents into chunks
-def split_documents(documents):
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=800,
-        chunk_overlap=150
+
+# splitting the data into chunks
+def split_text(documents):
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=500,
+        chunk_overlap = 100
     )
-    chunks = text_splitter.split_documents(documents)
+    chunks = splitter.split_documents(documents)
     return chunks
 
-#Creating Qdrant Vector Store
-
+#Embeddings & stroring in Vector DB
 
 def create_vector_store(chunks):
-    print("Loading embedding model...")
-    # Local HuggingFace embedding model
+
     embeddings = HuggingFaceEmbeddings(
         model_name="sentence-transformers/all-MiniLM-L6-v2"
     )
-    print("Connecting to Qdrant...")
 
-    # Local Qdrant database
     qdrant_client = QdrantClient(
         path=QDRANT_PATH
     )
 
-    # Create collection if it doesn't exist
     if not qdrant_client.collection_exists(COLLECTION_NAME):
-
-        print("Creating Qdrant collection...")
-
         qdrant_client.create_collection(
             collection_name=COLLECTION_NAME,
-            vectors_config=VectorParams(
-                size=384,
-                distance=Distance.COSINE
-            )
+            vectors_config=VectorParams(size=384, distance=Distance.COSINE),
         )
 
-    # Connect LangChain with Qdrant
     vector_store = QdrantVectorStore(
         client=qdrant_client,
         collection_name=COLLECTION_NAME,
         embedding=embeddings
     )
 
-    print("Adding chunks to Qdrant...")
-
-    # Convert chunks into embeddings
-    # and store them in Qdrant
     vector_store.add_documents(chunks)
     return vector_store
 
 
+
+
 if __name__ == "__main__":
+    print("Uploading Pdf .....")
+    documents = upload_pdf()
 
-    print("Loading PDF...")
-    documents = load_pdf()
+    print("\n\n CHunking Starts")
+    chunks = split_text(documents)
 
-    print(f"Loaded {len(documents)} pages")
-    print("\nSplitting documents...")
-
-    chunks = split_documents(documents)
-    print(f"Created {len(chunks)} chunks")
-
-    print("\nCreating vector store...")
+    print("\n\n vectoe db creation starts")
     vector_store = create_vector_store(chunks)
 
-    print("\nVector store created successfully!")
+    print("\n\n vector db created")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

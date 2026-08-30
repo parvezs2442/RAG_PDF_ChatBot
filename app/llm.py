@@ -1,16 +1,22 @@
-from openai import OpenAI
+
+from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
 
-api_key = os.getenv("OPENAI_API_KEY")
+api_key = os.getenv("GOOGLE_API_KEY")
 
 if not api_key:
-    raise ValueError("OPENAI_API_KEY is not set")
+    raise ValueError("GOOGLE_API_KEY is not set")
 
-client = OpenAI(api_key=api_key)
 
+model = ChatGoogleGenerativeAI(
+    model="gemini-3.5-flash",
+    temperature=1,
+    max_tokens=None,
+    max_retries=2,
+)
 
 def generate_answer(query, documents):
 
@@ -20,30 +26,31 @@ def generate_answer(query, documents):
         for document in documents
     )
 
-    response = client.responses.create(
-        model="gpt-5-mini",
+    prompt = f"""
+You are a helpful AI assistant.
 
-        input=[
-            {
-                "role": "system",
-                "content": (
-                    "You are a helpful AI assistant. "
-                    "Answer the user's question using only the provided context. "
-                    "If the answer is not present in the context, "
-                    "say: 'I don't know based on the provided document.'"
-                )
-            },
-            {
-                "role": "user",
-                "content": f"""
+Answer the user's question using ONLY the provided context.
+
+If the answer is not present in the context, say:
+"I don't know based on the provided document."
+
 Context:
 {context}
 
 Question:
 {query}
 """
-            }
-        ]
-    )
 
-    return response.output_text
+    response = model.invoke(prompt)
+
+    # Extract only the text from Gemini's structured response
+    if isinstance(response.content, list):
+        answer = "".join(
+            item["text"]
+            for item in response.content
+            if isinstance(item, dict) and item.get("type") == "text"
+        )
+        return answer
+
+    return response.content
+
