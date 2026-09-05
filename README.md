@@ -1,126 +1,90 @@
-# AI Research Platform & Assistant 🤖📚
-> **10-Day Portfolio-Grade Full-Stack AI & GenAI Roadmap Project**
+# AI Research Assistant 🤖
 
-An end-to-end AI-powered Research Assistant platform built with **FastAPI**, **LangChain**, **Qdrant**, and **Google Gemini**. The platform ingests private documents, converts them into high-dimensional semantic vector spaces, retrieves relevant context using similarity search, and produces grounded, hallucination-free answers.
+An AI-powered Research Platform that allows users to ask questions and conduct research using private documents (PDFs) and advanced AI. 
 
----
-
-## 📌 Project Overview & 10-Day Vision
-
-The ultimate goal of this project is to build an autonomous research platform where a user inputs a research question, and the system coordinates multi-agent research across private documents and live web data to produce a fully cited, evaluated research report.
-
-### 🗓️ Roadmap Progress
-
-| Day | Phase | Description | Status |
-| :---: | :--- | :--- | :---: |
-| **Day 1** | **Foundation** | Full-stack skeleton, FastAPI backend, environment setup, LLM API integration | ✅ **Completed** |
-| **Day 2** | **Basic RAG** | Document knowledge base: PDF ingestion, chunking, embeddings, vector DB, similarity search | ✅ **Completed** |
-| **Day 3** | **Advanced RAG** | Hybrid retrieval (BM25 + Dense vector), cross-encoder reranking, metadata filtering | ⏳ *Next Up* |
-| **Day 4** | **RAG Intelligence** | Conversation-aware query rewriting, multi-query expansion, parent/child chunking | ⏳ Planned |
-| **Day 5** | **Web Research** | Live web search tool, URL fetcher, content cleaner, web source citation | ⏳ Planned |
-| **Day 6** | **Agentic RAG** | Planner agent, dynamic tool selection, shared research state, bounded iterations | ⏳ Planned |
-| **Day 7** | **Multi-Agent Pipeline** | Specialized agents: Researcher → Reader → Analyst → Writer → Critic | ⏳ Planned |
-| **Day 8** | **Evals & Reliability** | Faithfulness, context recall/precision, citation verification, regression tests | ⏳ Planned |
-| **Day 9** | **Security & Guardrails** | Prompt injection defense, untrusted content sanitization, rate limiting, permissions | ⏳ Planned |
-| **Day 10**| **Production & Portfolio** | Modern UI dashboard, streaming responses, observability (latency/cost/traces), deployment | ⏳ Planned |
+Built as part of a **10-day hands-on GenAI engineering roadmap**, the project evolves from a foundational Document Knowledge Base (RAG) into an autonomous Multi-Agent Research Assistant capable of web browsing, cross-source analysis, and citation-backed reporting.
 
 ---
 
-## 🏗️ Day 1 & Day 2 Architecture
+## 📌 Project Status
 
-Currently, the foundation and document knowledge base (Day 1 & Day 2) are fully implemented.
-
-```
-=== 1. INGESTION PIPELINE (Offline / Ahead-of-Time) ===
-[ PDF Document ]
-       │
-       ▼
- [ PyPDFLoader ] ──────────────> Extracts raw pages & metadata
-       │
-       ▼
- [ RecursiveCharacterTextSplitter ]
- (chunk_size=500, overlap=100) ─> Splits into semantically coherent chunks
-       │
-       ▼
- [ all-MiniLM-L6-v2 Embedder ] ─> Generates 384-dimensional dense vectors
-       │
-       ▼
- [ Qdrant Vector Store ] ───────> Stored persistently on disk in 'qdrant_db/'
-
-
-=== 2. RUNTIME RETRIEVAL & GENERATION PIPELINE ===
-[ User Query via FastAPI (/ask) ]
-       │
-       ▼
- [ Qdrant Cosine Similarity Search ] (Top-K = 3)
-       │
-       ▼
- [ Grounded Context Assembly ]
-       │
-       ▼
- [ Google Gemini (gemini-3.5-flash) ]
- (Strict Prompt: "Answer ONLY using provided context")
-       │
-       ▼
-[ Accurate, Grounded Answer with Zero Hallucinations ]
-```
+- **Current Progress:** Day 2 of 10 Completed
+- **Current Capability:** Basic RAG pipeline with PDF ingestion, semantic vector search, grounded LLM response generation, and a FastAPI backend.
 
 ---
 
-## 💡 Why Each Component Exists
+## 🚀 10-Day Project Roadmap
 
-* **`PyPDFLoader`**: PDFs store text in binary display streams with irregular spacing. A specialized loader cleanly extracts textual content along with page numbers and document metadata.
-* **`RecursiveCharacterTextSplitter`**:
-  * **Chunk size (500)** keeps concepts tight and relevant.
-  * **Chunk overlap (100)** prevents ideas from being cut in half across chunk boundaries.
-  * **Recursive splitting** splits on paragraphs (`\n\n`), sentences (`\n`), and spaces (` `) before cutting arbitrarily.
-* **Embeddings (`sentence-transformers/all-MiniLM-L6-v2`)**: Transforms human sentences into 384-dimensional mathematical vectors where semantically similar concepts (e.g., *"work experience"* and *"career history"*) cluster closely together. Runs locally, fast, and free.
-* **Vector DB (`Qdrant`)**: Traditional relational databases index exact text strings. Qdrant uses Approximate Nearest Neighbor (ANN) index structures with Cosine distance to search high-dimensional vector spaces in milliseconds.
-* **Grounded LLM Prompting (`Gemini`)**: Restricting the model with strict system instructions prevents hallucination. If facts do not exist in the retrieved chunks, the model states *"I don't know based on the provided document"* rather than fabricating answers.
-* **FastAPI**: Serves the pipeline as a scalable, asynchronous REST API ready for web or mobile clients.
+- [x] **Day 1: Foundation & Project Skeleton** — Backend API setup, environment variables, and LLM integration.
+- [x] **Day 2: Basic RAG: Document Knowledge Base** — PDF text extraction, chunking, embeddings, vector database, and grounded Q&A.
+- [ ] **Day 3: Advanced RAG** — Hybrid retrieval (vector + keyword search), reranking, and metadata filtering.
+- [ ] **Day 4: RAG Intelligence** — Conversation-aware query rewriting, multi-query expansion, and parent-child retrieval.
+- [ ] **Day 5: Web Research & Ingestion** — Live web search tool, URL reading, HTML content cleaning, and source citations.
+- [ ] **Day 6: Agentic RAG & Tool Calling** — Planner agent, autonomous tool selection, state management, and bounded retries.
+- [ ] **Day 7: Multi-Agent Research Pipeline** — Coordinated agent team: *Researcher → Reader → Analyst → Writer → Critic*.
+- [ ] **Day 8: Evaluation & Reliability** — RAG quality metrics (faithfulness, context relevance, citation accuracy).
+- [ ] **Day 9: Security & Guardrails** — Prompt injection defense, input validation, and access control.
+- [ ] **Day 10: Production & Observability** — UI dashboard, response streaming, latency/token tracing, and deployment.
 
 ---
 
-## 📁 Repository Structure
+## 🧠 How It Works (Current Architecture)
 
-```
-├── app/
-│   ├── __init__.py
-│   ├── ingestion.py       # PDF loading, chunking, embedding & vector DB persistence
-│   ├── retrieval.py       # Qdrant client connection & similarity search (top-k)
-│   ├── llm.py             # Google Gemini integration & grounded prompt construction
-│   └── main.py            # FastAPI endpoints (GET /, POST /ask)
-├── data/                  # Source PDFs / reference documents
-├── qdrant_db/             # Local persistent Qdrant collection files
-├── requirements.txt       # Project dependencies
-├── .env                   # Environment variables (API keys - excluded from git)
-├── .gitignore             # Git ignore configurations
-└── README.md              # Project documentation
-```
+The system currently operates across two pipelines:
+
+### 1. Document Ingestion (Offline)
+1. **Load Document:** Extracts text from uploaded PDF files using `PyPDFLoader`.
+2. **Chunking:** Splits the text into 500-character chunks with a 100-character overlap using `RecursiveCharacterTextSplitter`.
+3. **Embeddings:** Converts each chunk into a 384-dimensional vector using Hugging Face's `all-MiniLM-L6-v2`.
+4. **Vector Storage:** Stores chunk embeddings and metadata locally in a `Qdrant` vector database.
+
+### 2. Retrieval & Generation (Online / Query Time)
+1. **Query:** User submits a question via the FastAPI `/ask` endpoint or CLI.
+2. **Similarity Search:** The query is embedded and compared against Qdrant vectors to find the Top-3 closest chunks.
+3. **Prompt Grounding:** Retrieved chunks are injected into a strict system prompt.
+4. **LLM Synthesis:** Google Gemini (`gemini-3.5-flash`) generates an answer strictly grounded in the document context.
 
 ---
 
 ## 🛠️ Tech Stack
 
-* **Language**: Python 3.11+
-* **Web Framework**: FastAPI, Uvicorn, Pydantic
-* **LLM Orchestration**: LangChain, `langchain-google-genai`
-* **Large Language Model**: Google Gemini (`gemini-3.5-flash`)
-* **Vector Database**: Qdrant (`qdrant-client`, `langchain-qdrant`)
-* **Embedding Model**: Hugging Face Sentence Transformers (`all-MiniLM-L6-v2`)
-* **Document Processing**: `pypdf`
+- **Backend:** Python 3.11+, FastAPI, Uvicorn, Pydantic
+- **LLM:** Google Gemini (`gemini-3.5-flash`) via `langchain-google-genai`
+- **Embedding Model:** `sentence-transformers/all-MiniLM-L6-v2` (Hugging Face)
+- **Vector Database:** Qdrant (Local disk-based storage)
+- **Document Processing:** LangChain, `pypdf`
+- **Configuration:** `python-dotenv`
 
 ---
 
-## 🚀 Quickstart & Installation
+## 📁 Project Structure
+
+```text
+├── app/
+│   ├── __init__.py
+│   ├── ingestion.py      # PDF parsing, text chunking, and Qdrant indexing
+│   ├── retrieval.py      # Similarity search to fetch relevant document chunks
+│   ├── llm.py            # Gemini client & grounded answer prompt logic
+│   └── main.py           # FastAPI REST application endpoints
+├── data/                 # Folder for reference PDFs / documents
+├── qdrant_db/            # Local Qdrant vector database storage
+├── requirements.txt      # Python dependencies
+├── .env                  # Environment variables (API keys)
+├── .gitignore            # Files ignored by git
+└── README.md             # Project documentation
+```
+
+---
+
+## ⚙️ Installation & Setup
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/parvezs2442/RAG_PDF_ChatBot.git
-cd RAG_PDF_ChatBot
+git clone https://github.com/parvezs2442/AI_Research_Assistant.git
+cd AI_Research_Assistant
 ```
 
-### 2. Create and Activate Virtual Environment
+### 2. Create a Virtual Environment
 ```bash
 # Windows
 python -m venv venv
@@ -131,87 +95,75 @@ python3 -m venv venv
 source venv/bin/activate
 ```
 
-### 3. Install Dependencies
+### 3. Install Required Packages
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Setup Environment Variables
-Create a `.env` file in the root directory:
+### 4. Configure API Keys
+Create a `.env` file in the root folder:
 ```env
 GOOGLE_API_KEY=your_google_gemini_api_key_here
 ```
 
 ---
 
-## 💻 Running the Application
+## 🏃 How to Run
 
-### Step 1: Ingest Document into Vector Store
-Run the ingestion script to process your PDF, chunk it, and save the embeddings into Qdrant:
+### Step 1: Ingest Your Document
+Place your PDF in the `data/` folder and run the ingestion script to create vector embeddings:
 ```bash
 python -m app.ingestion
 ```
 
-### Step 2: Test Retrieval via Terminal
-You can interactively test vector retrieval and LLM responses in the command line:
+### Step 2: Test via Terminal (Optional)
+Test the retrieval and generation pipeline interactively in your terminal:
 ```bash
 python -m app.retrieval
 ```
 
-### Step 3: Start the FastAPI Server
-Launch the REST API server:
+### Step 3: Run the FastAPI Web Server
+Start the backend server:
 ```bash
 uvicorn app.main:app --reload
 ```
-The server will start at `http://127.0.0.1:8000`.
+The server will start at: `http://127.0.0.1:8000`
 
 ---
 
-## 📖 API Documentation & Endpoints
+## 📡 API Endpoints
 
-Once the server is running, visit the interactive Swagger documentation at:
+### 1. Health Check
+- **Endpoint:** `GET /`
+- **Response:**
+  ```json
+  {
+    "message": "RAG API is running"
+  }
+  ```
+
+### 2. Ask Question
+- **Endpoint:** `POST /ask`
+- **Request Body:**
+  ```json
+  {
+    "query": "What are the candidate's core technical skills?"
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "question": "What are the candidate's core technical skills?",
+    "answer": "According to the document, the candidate has expertise in Python, FastAPI, LangChain, Qdrant, and Generative AI application development."
+  }
+  ```
+
+Interactive Swagger documentation is available at:
 👉 **`http://127.0.0.1:8000/docs`**
-
-### `GET /`
-Health check endpoint.
-```json
-{
-  "message": "RAG API is running"
-}
-```
-
-### `POST /ask`
-Ask a question against the ingested document knowledge base.
-
-**Request:**
-```http
-POST /ask HTTP/1.1
-Content-Type: application/json
-
-{
-  "query": "What are Parvez's primary technical skills and projects?"
-}
-```
-
-**Response:**
-```json
-{
-  "question": "What are Parvez's primary technical skills and projects?",
-  "answer": "Based on the provided document, Parvez has expertise in Python, FastAPI, LangChain, Qdrant, and Generative AI application development..."
-}
-```
-
----
-
-## 🔮 What's Next (Day 3: Advanced RAG)
-
-* **Hybrid Search**: Combining Dense Semantic Vector Search with Sparse BM25 Keyword Search.
-* **Cross-Encoder Reranking**: Re-scoring top candidates with a cross-encoder to elevate the most relevant chunks.
-* **Metadata Filtering**: Filtering chunks by document name, chapter, or date.
 
 ---
 
 ## 👤 Author
 
 **Parvez Saifi**  
-* GitHub: [@parvezs2442](https://github.com/parvezs2442)
+- GitHub: [@parvezs2442](https://github.com/parvezs2442)
