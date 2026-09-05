@@ -1,34 +1,10 @@
 # AI Research Assistant 🤖
 
-An AI-powered Research Platform that allows users to ask questions and conduct research using private documents (PDFs) and advanced AI. 
-
-Built as part of a **10-day hands-on GenAI engineering roadmap**, the project evolves from a foundational Document Knowledge Base (RAG) into an autonomous Multi-Agent Research Assistant capable of web browsing, cross-source analysis, and citation-backed reporting.
+An AI-powered Research Platform and Retrieval-Augmented Generation (RAG) system that allows users to ask questions and extract insights from private documents (PDFs) with high accuracy and factual grounding.
 
 ---
 
-## 📌 Project Status
-
-- **Current Progress:** Day 2 of 10 Completed
-- **Current Capability:** Basic RAG pipeline with PDF ingestion, semantic vector search, grounded LLM response generation, and a FastAPI backend.
-
----
-
-## 🚀 10-Day Project Roadmap
-
-- [x] **Day 1: Foundation & Project Skeleton** — Backend API setup, environment variables, and LLM integration.
-- [x] **Day 2: Basic RAG: Document Knowledge Base** — PDF text extraction, chunking, embeddings, vector database, and grounded Q&A.
-- [ ] **Day 3: Advanced RAG** — Hybrid retrieval (vector + keyword search), reranking, and metadata filtering.
-- [ ] **Day 4: RAG Intelligence** — Conversation-aware query rewriting, multi-query expansion, and parent-child retrieval.
-- [ ] **Day 5: Web Research & Ingestion** — Live web search tool, URL reading, HTML content cleaning, and source citations.
-- [ ] **Day 6: Agentic RAG & Tool Calling** — Planner agent, autonomous tool selection, state management, and bounded retries.
-- [ ] **Day 7: Multi-Agent Research Pipeline** — Coordinated agent team: *Researcher → Reader → Analyst → Writer → Critic*.
-- [ ] **Day 8: Evaluation & Reliability** — RAG quality metrics (faithfulness, context relevance, citation accuracy).
-- [ ] **Day 9: Security & Guardrails** — Prompt injection defense, input validation, and access control.
-- [ ] **Day 10: Production & Observability** — UI dashboard, response streaming, latency/token tracing, and deployment.
-
----
-
-## 🧠 How It Works (Current Architecture)
+## 🧠 How It Works (Architecture)
 
 The system currently operates across two pipelines:
 
