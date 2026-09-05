@@ -35,6 +35,9 @@ def retrieve_relevant_chunks(query):
     )
     return relevant_chunks
 
+# Alias for backwards compatibility
+retrieve_documents = retrieve_relevant_chunks
+
 
 
     

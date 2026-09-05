@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-from app.retrieval import retrieve_documents
+from app.retrieval import retrieve_relevant_chunks
 from app.llm import generate_answer
 
 
@@ -23,7 +23,7 @@ def home():
 def ask_question(request: QueryRequest):
 
     # Retrieve relevant chunks from Qdrant
-    documents = retrieve_documents(request.query)
+    documents = retrieve_relevant_chunks(request.query)
 
     # Generate answer using LLM
     answer = generate_answer(
