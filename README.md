@@ -14,11 +14,17 @@ The system currently operates across two pipelines:
 3. **Embeddings:** Converts each chunk into a 384-dimensional vector using Hugging Face's `all-MiniLM-L6-v2`.
 4. **Vector Storage:** Stores chunk embeddings and metadata locally in a `Qdrant` vector database.
 
-### 2. Retrieval & Generation (Online / Query Time)
-1. **Query:** User submits a question via the FastAPI `/ask` endpoint or CLI.
-2. **Similarity Search:** The query is embedded and compared against Qdrant vectors to find the Top-3 closest chunks.
-3. **Prompt Grounding:** Retrieved chunks are injected into a strict system prompt.
-4. **LLM Synthesis:** Google Gemini (`gemini-3.5-flash`) generates an answer strictly grounded in the document context.
+### 2. Advanced Retrieval & Generation Pipeline (Online / Query Time)
+1. **User Query:** User submits a research question via the FastAPI `/ask` endpoint or CLI.
+2. **Hybrid Candidate Search:**
+   - **Dense Search (Semantic):** Qdrant vector similarity search via `all-MiniLM-L6-v2`.
+   - **Sparse Search (Exact Keywords):** BM25 index search via `rank-bm25`.
+   - **Reciprocal Rank Fusion (RRF):** Combines dense and sparse results ($1 / (60 + \text{rank})$) to assemble a wide candidate pool.
+3. **Cross-Encoder Reranking:** 
+   - A dedicated Cross-Encoder (`cross-encoder/ms-marco-MiniLM-L-6-v2`) evaluates deep `[Query + Chunk]` interactions.
+   - Assigns true relevance scores to each candidate chunk.
+4. **Relevance Thresholding & Deduplication:** Filters out poor-scoring or duplicate chunks.
+5. **Prompt Grounding & Synthesis:** Best chunks are formatted as context for Google Gemini (`gemini-3.5-flash`), producing a verified, grounded answer.
 
 ---
 
@@ -26,7 +32,9 @@ The system currently operates across two pipelines:
 
 - **Backend:** Python 3.11+, FastAPI, Uvicorn, Pydantic
 - **LLM:** Google Gemini (`gemini-3.5-flash`) via `langchain-google-genai`
-- **Embedding Model:** `sentence-transformers/all-MiniLM-L6-v2` (Hugging Face)
+- **Dense Embedding Model:** `sentence-transformers/all-MiniLM-L6-v2`
+- **Sparse Keyword Search:** BM25 (`rank-bm25`)
+- **Reranker Model:** Cross-Encoder (`cross-encoder/ms-marco-MiniLM-L-6-v2`)
 - **Vector Database:** Qdrant (Local disk-based storage)
 - **Document Processing:** LangChain, `pypdf`
 - **Configuration:** `python-dotenv`
