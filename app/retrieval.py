@@ -148,7 +148,7 @@ def hybrid_search(
     candidate_k: int = 8,
     metadata_filter: Optional[Dict[str, Any]] = None,
 ) -> List[Document]:
-    """Step 1 of Day 3: Generates a wide candidate pool via Hybrid Retrieval."""
+    """Generates a wide candidate pool via Hybrid Retrieval (Dense Vector + Sparse BM25)."""
     vector_store = get_vector_store()
     vector_candidates = vector_store.similarity_search(query, k=candidate_k)
     bm25_candidates = bm25_search(query, top_k=candidate_k, metadata_filter=metadata_filter)
@@ -170,8 +170,8 @@ def rerank_candidates(
     verbose: bool = True,
 ) -> List[Document]:
     """
-    Step 2 of Day 3: Cross-Encoder Reranking and Relevance Thresholding.
-    Deeply evaluates [Query + Chunk] interactions and drops irrelevant candidates.
+    Cross-Encoder Reranking and Relevance Thresholding.
+    Deeply evaluates [Query + Chunk] mutual attention and ranks candidates by true relevance.
     """
     if not candidates:
         return []
@@ -191,7 +191,7 @@ def rerank_candidates(
 
     if verbose and scored_candidates:
         print("\n" + "=" * 55)
-        print("[Day 3 Pipeline Diagnostics - Reranker Scores]")
+        print("[Retrieval Pipeline Diagnostics - Reranker Scores]")
         print("=" * 55)
         for rank, (doc, sc) in enumerate(scored_candidates[:top_k], start=1):
             clean_snippet = (
@@ -214,7 +214,7 @@ def advanced_retrieval(
     verbose: bool = True,
 ) -> List[Document]:
     """
-    Day 3 Complete Pipeline:
+    Complete Retrieval Pipeline:
     Query -> Hybrid Retrieval (Dense + Sparse) -> Candidate Pool -> Cross-Encoder Reranker -> Threshold -> Top-K Context
     """
     # 1. Candidate Generation via Hybrid Search
@@ -244,7 +244,7 @@ def retrieve_relevant_chunks(
     metadata_filter: Optional[Dict[str, Any]] = None,
     verbose: bool = True,
 ) -> List[Document]:
-    """Main retrieval entrypoint using the Day 3 Advanced Pipeline."""
+    """Main retrieval entrypoint using the advanced hybrid and reranking pipeline."""
     return advanced_retrieval(
         query=query,
         top_k=top_k,
